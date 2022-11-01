@@ -1,0 +1,69 @@
+#include<stdio.h>
+#include<string.h>
+
+//ASC码中33-126为实际有效输出
+//以控制偏移量到死区外为核心
+
+void encode(char* input, char* output, int shift)//加密
+{
+	FILE* hInputFile = NULL;
+	FILE* hOutputFile = NULL;
+	errno_t err1, err2;				//为了对应最新的fopen_s需要写errno_t 返回0代表无错误
+
+	char Letter;
+
+	err1 = fopen_s(&hInputFile, input, "rt");
+	err2 = fopen_s(&hOutputFile, output, "wt");
+	if (err1 || err2) printf("error\n");
+
+	else// (!err1 && !err2)
+	{
+		Letter = fgetc(hInputFile);
+		while (!feof(hInputFile))
+		{
+			if (Letter > 32)
+				Letter = (Letter + shift % (126 - 33) - 33 + (126 - 33)) % (126 - 33) + 33;
+			fputc(Letter, hOutputFile);
+			Letter = fgetc(hInputFile);
+		}
+	}
+	fclose(hInputFile);
+	fclose(hOutputFile);
+}
+
+void decode(char* input, char* output, int shift)//解码
+{
+	FILE* hInputFile = NULL;
+	FILE* hOutputFile = NULL;
+	errno_t err1, err2;
+
+	char Letter;
+
+	err1 = fopen_s(&hInputFile, input, "rt");
+	err2 = fopen_s(&hOutputFile, output, "wt");
+	if (err1 || err2) printf("error\n");
+
+	else// (!err1 && !err2)
+	{
+		Letter = fgetc(hInputFile);
+		while (!feof(hInputFile))
+		{
+			if (Letter > 32)
+				Letter = (Letter - shift % (126 - 33) - 33 + (126 - 33)) % (126 - 33) + 33;
+			fputc(Letter, hOutputFile);
+			Letter = fgetc(hInputFile);
+		}
+	}
+	fclose(hInputFile);
+	fclose(hOutputFile);
+}
+
+void main()
+{
+	char* inputfile = "Input.txt";
+	char* outputfile1 = "Output-encode.txt";
+	char* outputfile2 = "Output-decode.txt";
+	int shift = -15;
+	encode(inputfile, outputfile1, shift);
+	decode(outputfile1, outputfile2, shift);
+}
