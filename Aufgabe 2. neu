@@ -1,0 +1,64 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+
+#define MAX 500
+
+void  encrypt1(FILE* hInputFile, FILE* hOutputFile, int t)
+{
+
+    char a[MAX];
+    while (!feof(hInputFile))
+    {
+        for (int i = 0; i < MAX; i++)
+            a[i] = fgetc(hInputFile);
+
+        for (int i = 0; i < MAX; i++) 
+        {
+            if (a[i] < 65 || a[i]>122) 
+            {
+                a[i] = a[i];
+            }
+            else if (a[i] >= 65 && a[i] <= 90) 
+            {
+                a[i] = (a[i] - 65 + t) % 26 + 65;
+            }
+            else if (a[i] >= 97 && a[i] <= 122) 
+            {
+                a[i] = (a[i] - 97 + t) % 26 + 65;
+            }
+            fputc(a[i], hOutputFile);
+        }
+    }
+}
+
+
+
+int main() 
+{
+    FILE* hInputFile = NULL;
+    FILE* hOutputFile = NULL;
+
+    hInputFile = fopen("D:\\My Office\\Programmieren in C\\Praktikum\\Project 1\\Beispiel 1.txt", "r");
+    if (NULL == hInputFile)
+        printf("Eingabedatei konnte nicht geoeffnet werden!\n");
+    hOutputFile = fopen("D:\\My Office\\Programmieren in C\\Praktikum\\Project 1\\Kodiert 1.txt", "w");
+    if (NULL == hOutputFile)
+        printf("Ausgabedatei konnte nicht geoeffnet werden!\n");
+
+    if (hInputFile && hOutputFile)
+    {
+        while (!feof(hInputFile)) 
+        {
+            encrypt1(hInputFile, hOutputFile, 5);
+        }
+
+        if (hInputFile)  
+            fclose(hInputFile);
+        if (hOutputFile) 
+            fclose(hOutputFile);
+        printf("\nDatei erfolgreich kodiert!\n");
+
+        return 0;
+    }
+}
